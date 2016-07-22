@@ -92,12 +92,13 @@ func main() {
 		fmt.Printf("Usage: %s host:port [-v][-workers #]\n", os.Args[0])
 		return
 	}
-	fmt.Println("Addr: ", flag.Arg(0))
+	fmt.Println("Addr:", flag.Arg(0))
 	addr, err := net.ResolveTCPAddr("tcp", flag.Arg(0))
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	fmt.Println("Resolved!")
 	for i := 0; i < options.workers; i++ {
 		go func() {
 			for {
