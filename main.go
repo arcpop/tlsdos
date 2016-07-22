@@ -47,7 +47,7 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 func runTLSDoSInstance(addr *net.TCPAddr) {
 	c, err := net.DialTCP("tcp", nil, addr)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error: ", err)
 		return
 	}
 	defer c.Close()
