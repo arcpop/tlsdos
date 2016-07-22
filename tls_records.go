@@ -14,8 +14,8 @@ var clientHello = []byte{
 	0xc6, 0x6e, 0xdd, 0x79, 0x59, 0xfd, 0xba, 0xff,
 	0x00,       //Session ID Length: 0
 	0x00, 0x02, //Cipher Suites Length: 2
-	0x00, 0x9c, //Cipher Suite: TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
-	//0xc0, 0x2f, //Cipher Suite: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xc02f)
+	//0x00, 0x9c, //Cipher Suite: TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
+	0xc0, 0x2f, //Cipher Suite: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xc02f)
 	0x01, 0x00, //No compression
 	0x00, 0x16, //Extension Length: 22
 
