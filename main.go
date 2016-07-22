@@ -38,7 +38,7 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 			continue
 		}
 		fmt.Printf("Handshake type: %d\n", content[0])
-		if content[0] == 2 {
+		if content[0] == 12 {
 			return true, nil
 		}
 	}
