@@ -16,7 +16,7 @@ var options struct {
 }
 
 func init() {
-	flag.BoolVar(&options.verbose, "v", false, "Verbose output")
+	flag.BoolVar(&options.verbose, "v", true, "Verbose output")
 	flag.IntVar(&options.workers, "workers", 0, "Number of additional worker go routines")
 }
 
