@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 )
 
 var options struct {
@@ -87,7 +88,10 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 
 func main() {
 	flag.Parse()
-	fmt.Println(flag.Arg(0))
+	if flag.Arg(0) == "" {
+		fmt.Printf("Usage: %s host [-v][-workers #]", os.Args[0])
+		return
+	}
 	addr, err := net.ResolveTCPAddr("tcp", flag.Arg(0))
 	if err != nil {
 		log.Println(err)
