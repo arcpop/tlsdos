@@ -89,7 +89,7 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 func main() {
 	flag.Parse()
 	if flag.Arg(0) == "" {
-		fmt.Printf("Usage: %s host [-v][-workers #]", os.Args[0])
+		fmt.Printf("Usage: %s host [-v][-workers #]\n", os.Args[0])
 		return
 	}
 	addr, err := net.ResolveTCPAddr("tcp", flag.Arg(0))
