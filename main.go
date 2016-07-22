@@ -28,14 +28,14 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if header[0] != 22 {
-			log.Println("Invalid content type")
-			return false, nil
-		}
 		content := make([]byte, binary.BigEndian.Uint16(header[3:5]))
 		_, err = io.ReadFull(c, content)
 		if err != nil {
 			return false, err
+		}
+		if header[0] != 22 {
+			log.Println("Invalid content type")
+			continue
 		}
 		fmt.Printf("Handshake type: %d\n", content[0])
 		if content[0] == 2 {
