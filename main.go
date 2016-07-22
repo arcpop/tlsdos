@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -37,7 +36,7 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 			log.Println("Invalid content type")
 			continue
 		}
-		fmt.Printf("Handshake type: %d\n", content[0])
+		log.Printf("Handshake type: %d\n", content[0])
 		if content[0] == 12 {
 			return true, nil
 		}
