@@ -29,7 +29,6 @@ func init() {
 
 func sendTLSDoS(c *net.TCPConn) (bool, error) {
 	c.SetWriteDeadline(time.Now().Add(time.Second))
-	c.SetReadDeadline(time.Now().Add(time.Second))
 	i := 0
 	for i < len(clientHello) {
 		n, err := c.Write(clientHello[i:])
@@ -42,6 +41,7 @@ func sendTLSDoS(c *net.TCPConn) (bool, error) {
 		log.Println("Wrote ClientHello")
 	}
 	for {
+		c.SetReadDeadline(time.Now().Add(time.Second))
 		var header [5]byte
 		_, err := io.ReadFull(c, header[:])
 		if err != nil {
