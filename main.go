@@ -28,12 +28,11 @@ func init() {
 }
 
 func sendTLSDoS(c *net.TCPConn) (bool, error) {
-	array := make([]byte, len(clientHello))
-	copy(array, clientHello)
+	c.SetWriteDeadline(time.Now().Add(time.Second))
+	c.SetReadDeadline(time.Now().Add(time.Second))
 	i := 0
-	c.SetDeadline(time.Now().Add(time.Second))
-	for i < len(array) {
-		n, err := c.Write(array[i:])
+	for i < len(clientHello) {
+		n, err := c.Write(clientHello[i:])
 		if err != nil {
 			return false, err
 		}
