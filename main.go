@@ -17,12 +17,13 @@ var successes uint64
 var errors uint64
 
 var options struct {
-	verbose bool
-	workers int
+	verbose, reopen bool
+	workers         int
 }
 
 func init() {
 	flag.BoolVar(&options.verbose, "v", false, "Verbose output")
+	flag.BoolVar(&options.reopen, "reopen", false, "Open a new connection for every ClientHello")
 	flag.IntVar(&options.workers, "workers", 1, "Number of worker go routines")
 }
 
@@ -93,6 +94,9 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 			atomic.AddUint64(&successes, 1)
 		} else {
 			atomic.AddUint64(&errors, 1)
+		}
+		if options.reopen {
+			return
 		}
 	}
 }
