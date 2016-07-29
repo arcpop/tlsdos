@@ -1,12 +1,12 @@
 package main
 
-var clientHello = []byte{
+var clientHelloPrototype = []byte{
 	0x16,       //Content Type: Handshake (22)
 	0x03, 0x01, //Version: TLS 1.0 (0x0301)
-	0x00, 0x45, //Length: 69
+	0x00, 0x54, //Length: 84 -> TO FILL WHEN USING SNI
 
 	0x01,             //Handshake Type: Client Hello (1)
-	0x00, 0x00, 0x41, //Length: 65
+	0x00, 0x00, 0x50, //Length: 80 -> TO FILL WHEN USING SNI
 	0x03, 0x03, //Version: TLS 1.2 (0x0303)
 	0x1c, 0x32, 0xdb, 0xd9, 0x3c, 0x12, 0x75, 0x93, //Random Bytes
 	0xaf, 0x9b, 0x8b, 0x7c, 0xa1, 0x48, 0x66, 0xaa,
@@ -17,7 +17,7 @@ var clientHello = []byte{
 	//0x00, 0x9c, //Cipher Suite: TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
 	0xc0, 0x2f, //Cipher Suite: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xc02f)
 	0x01, 0x00, //No compression
-	0x00, 0x16, //Extension Length: 22
+	0x00, 0x25, //Extension Length: 37 -> TO FILL WHEN USING SNI
 
 	0x00, 0x0a, //Extension Type: elliptic_curves (0x000a)
 	0x00, 0x04, //Extension Length: 4
@@ -34,4 +34,15 @@ var clientHello = []byte{
 	0x00, 0x02, //Signature Hash Algorithms Length: 2
 	0x04, 0x01, //Signature Hash Algorithm: RSA with SHA256
 
+	0x00, 0x10, //Extension Type: Application Layer Protocol Negotiation (0x0010)
+	0x00, 0x0B, //Extension Length: 11
+	0x00, 0x09, //ALPN Extension Length: 9
+	0x08,                                           //ALPN string length: 8
+	0x68, 0x74, 0x74, 0x70, 0x2F, 0x41, 0x2E, 0x31, //ALPN Next Protocol: http/1.1
+
+	0x00, 0x00, //Extension Type: server_name (0x0000)
+	0x00, 0x17, //Extension Length: -> TO FILL WHEN USING SNI
+	0x00, 0x00, //Server Name list length -> TO FILL WHEN USING SNI
+	0x00,       //Server Name Type: host_name (0)
+	0x00, 0x00, //Server Name length:  -> TO FILL WHEN USING SNI
 }
