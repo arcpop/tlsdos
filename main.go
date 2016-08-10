@@ -112,8 +112,14 @@ func generatePacket(serverName string) {
 	realName = strings.Split(realName, "/")[0]
 	ip := net.ParseIP(realName)
 	if ip != nil {
+		if options.verbose {
+			fmt.Println("IP: ", realName)
+		}
 		clientHello = clientHelloPrototype[:len(clientHelloPrototype)-9]
 		return
+	}
+	if options.verbose {
+		fmt.Println("Server name for SNI: ", realName)
 	}
 
 	name := []byte(realName)
